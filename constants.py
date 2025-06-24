@@ -13,6 +13,25 @@ class TxBandwidth(IntEnum):
     BW_25 = 25000
 
 
+class DmrColorCode(IntEnum):
+    CC0 = 0
+    CC1 = 1
+    CC2 = 2
+    CC3 = 3
+    CC4 = 4
+    CC5 = 5
+    CC6 = 6
+    CC7 = 7
+    CC8 = 8
+    CC9 = 9
+    CC10 = 10
+    CC11 = 11
+    CC12 = 12
+    CC13 = 13
+    CC14 = 14
+    CC15 = 15
+
+
 class OnOff(IntEnum):
     ON = 1
     OFF = 0
@@ -306,3 +325,9 @@ class StateCodes(IntEnum):
     WV = 54
     WI = 55
     WY = 56
+
+
+class RepeaterStatus(StrEnum):
+    UNKNOKWN = "Unknown"
+    ONAIR = "On-air"
+    OFFAIR = "Off-air"

@@ -1,3 +1,5 @@
+# pyright: reportUnusedCallResult=false
+
 import os
 import requests
 
@@ -8,6 +10,7 @@ from pydantic import model_validator
 from pathlib import Path
 from diskcache import Cache
 from typing import TypeVar
+from typing import cast
 
 from models import RepeaterBookResults
 from constants import RepeaterMode
@@ -40,7 +43,7 @@ class QueryTerms(BaseModel):
 
         return data
 
-    def make_query_term(self, k, v):
+    def make_query_term(self, k: str, v) -> str:
         return f"{k}={v}"
 
     def to_query(self) -> str:
@@ -61,6 +64,7 @@ class QueryTerms(BaseModel):
 class RepeaterBook(requests.Session):
     baseurl: str = "https://www.repeaterbook.com/api/export.php"
     user_agent: str = "repeaterbook.py; repeaterbook@mailinator.com"
+    cache_lifetime: int = 1800
 
     def __init__(self, user_agent: str | None = None):
         super().__init__()
@@ -71,7 +75,7 @@ class RepeaterBook(requests.Session):
         self.headers["user-agent"] = self.user_agent
 
     def query(self, terms: QueryTerms) -> RepeaterBookResults:
-        content = cache.get(terms)
+        content: bytes = cast(bytes, cache.get(terms))
 
         if not content:
             query = terms.to_query()
@@ -79,6 +83,6 @@ class RepeaterBook(requests.Session):
             res = self.get(url)
             res.raise_for_status()
             content = res.content
-            cache.set(terms, content, expire=600)
+            cache.set(terms, content, expire=self.cache_lifetime)
 
         return RepeaterBookResults.model_validate_json(content)

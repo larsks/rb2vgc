@@ -10,12 +10,13 @@ from typing import TextIO
 from typing import Self
 from typing import Literal
 
-from constants import RepeaterDcsCode, RepeaterTone
+from constants import DmrColorCode, RepeaterDcsCode, RepeaterTone
 from constants import TxPower
 from constants import TxBandwidth
 from constants import Mode
 from constants import OnOff
 from constants import RepeaterUse
+from constants import RepeaterStatus
 
 
 def parse_bool_str(v: str):
@@ -32,17 +33,34 @@ class Repeater(BaseModel):
     tx_code: PlCode = Field(..., alias="PL")
     rx_code: PlCode = Field(..., alias="TSQ")
     callsign: str = Field(..., alias="Callsign")
+    dmr: BoolStr = Field(..., alias="DMR")
+    dmr_cc: DmrColorCode | None = Field(..., alias="DMR Color Code")
+    d_star: BoolStr = Field(..., alias="D-Star")
+    nxdn: BoolStr = Field(..., alias="NXDN")
+    m17: BoolStr = Field(..., alias="M17")
+    system_fusion: BoolStr = Field(..., alias="System Fusion")
+    ares: BoolStr = Field(..., alias="ARES")
+    races: BoolStr = Field(..., alias="RACES")
+    skywarn: BoolStr = Field(..., alias="SKYWARN")
+    canwarn: BoolStr = Field(..., alias="CANWARN")
     fm_analog: BoolStr = Field(..., alias="FM Analog")
     fm_bandwidth: str = Field(..., alias="FM Bandwidth")
     country: str | None = Field(None, alias="Country")
     state: str | None = Field(None, alias="State")
     county: str | None = Field(None, alias="County")
     city: str | None = Field(None, alias="Nearest City")
-    lat: float | None = Field(None, alias="Lat")
-    lon: float | None = Field(None, alias="Long")
-    status: str | None = Field(None, alias="Operational Status")
-    use: str | None = Field(None, alias="Use")
+    lat: float = Field(None, alias="Lat")
+    lon: float = Field(None, alias="Long")
+    status: RepeaterStatus | None = Field(None, alias="Operational Status")
+    use: RepeaterUse | None = Field(None, alias="Use")
     notes: str | None = Field(None, alias="Notes")
+
+    @field_validator("dmr_cc", mode="before")
+    @classmethod
+    def validate_dmr_cc(cls, v: str) -> DmrColorCode | None:
+        if v == "":
+            return None
+        return next(cc for cc in DmrColorCode if cc == int(v))
 
 
 class VGCChannel(BaseModel):
