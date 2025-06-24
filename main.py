@@ -2,19 +2,29 @@ import argparse
 import sys
 
 from pydantic import BaseModel
+from enum import Enum
 
 import models
 import repeaterbook
 
 
+FrequencyBand = {
+    "6m": (50, 54),
+    "2m": (144, 148),
+    "70cm": (420, 450),
+}
+
+
 class Options(BaseModel):
     query: list[str]
+    band: str | None
     output: str | None
 
 
 def parse_args():
     p = argparse.ArgumentParser()
     p.add_argument("--output", "-o")
+    p.add_argument("-b", "--band", choices=FrequencyBand)
     p.add_argument("query", nargs="+")
     return Options.model_validate(vars(p.parse_args()))
 
